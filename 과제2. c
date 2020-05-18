@@ -1,0 +1,297 @@
+// 연결리스트로 표현한 이진 트리의 순회 및 연산 프로그램
+
+/*
+	>>> 기존 강의자료 소스코드에서 변경한 점
+
+	1. typedef 로 간단한 자료형을 재정의 하는 문장은 제외했음.
+	2. "전처리문 - 구조체 - 전역변수 - 사용자 정의 함수 - 메인함수" 순서로 구성함.
+	3. 메인 함수의 반환형을 int 로 변경하고 함수가 끝날 때 0을 반환함.
+	4. 문제에서 요구하는 사용자 정의 함수를 5개 추가함. */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h> // 절대값을 반환하는 함수 abs를 사용하기 위함
+
+#define MAX_QUEUE_SIZE 100 // 큐에 저장될 수 있는 데이터의 최대 개수
+
+typedef struct BinTrNode { // 이진트리의 노드 정보를 저장
+	char data; // 노드에 저장될 알파벳
+	struct BinTrNode* left; // 왼쪽 자식 노드를 가리키는 노드
+	struct BinTrNode* right; // 오른쪽 자식 노드를 가리키는 노드
+} TNode; // 타입을 TNode로 정의
+
+TNode* root; // 루트 노드
+TNode* data[MAX_QUEUE_SIZE]; // 노드 요소들의 배열
+int front, rear;
+int curr_level, depth = 1; // level() 함수의 구성요소
+int total_length; // path_length() 함수의 구성요소
+int tree_height; // 주어진 트리의 높이를 저장하는 함수
+
+void init_tree() { // 루트 노드를  NULL로 초기화
+	root = NULL;
+}
+
+int is_empty_tree() { // 루트 노트가 NULL이다 -> 트리가 없다
+	return root == NULL;
+}
+
+TNode* get_root() { // 루트값을 반환
+	return root;
+}
+
+TNode* create_tree(char val, TNode* l, TNode* r) {
+	TNode* n = (TNode*)malloc(sizeof(TNode)); // 동적할당 -> 노드 생성
+	// 생성된 노드에 아래와 같이 값을 대입한다.
+	n->data = val;
+	n->left = l;
+	n->right = r;
+}
+
+/* 아래의 함수 3개는 재귀 구조이다. */
+void preorder(TNode* n) {
+	if (n != NULL) { // NULL이 아니다 -> 즉, 자식 노드가 있다.
+		printf("[%c] ", n->data); // 1. 먼저 값을 출력하고
+		preorder(n->left); // 2. 왼쪽 자식 노드를 탐색
+		preorder(n->right); // 3. 오른쪽 자식 노드를 탐색
+	}
+}
+
+void inorder(TNode* n) {
+	if (n != NULL) { // NULL이 아니다 -> 즉, 자식 노드가 있다.
+		inorder(n->left); // 1. 먼저 왼쪽 자식 노드를 탐색
+		printf("[%c] ", n->data); // 2. 값을 출력하고
+		inorder(n->right); // 3. 오른쪽 자식 노드를 탐색
+	}
+}
+
+void postorder(TNode* n) {
+	if (n != NULL) { // NULL이 아니다 -> 즉, 자식 노드가 있다.
+		postorder(n->left); // 1. 먼저 왼쪽 자식 노드를 탐색
+		postorder(n->right); // 2. 오른쪽 자식 노드를 탐색
+		printf("[%c] ", n->data); // 3. 값을 출력한다.
+	}
+}
+
+// 큐의 공통적인 주요 연산
+void error(char* str) { // 에러처리
+	fprintf(stderr, "%s\n", str);
+	exit(1);
+}
+
+void init_queue() { // 큐의 초기값 지정
+	front = rear = 0;
+}
+
+int is_empty() { // 큐가 비었는지 확인
+	return front == rear;
+}
+
+int is_full() { // 큐가 포화상태인지 확인
+	return front == (rear + 1) % MAX_QUEUE_SIZE;
+}
+
+int size() { // 큐에 들어있는 데이터의 개수를 반환
+	return (rear - front + MAX_QUEUE_SIZE) % MAX_QUEUE_SIZE;
+}
+
+void enqueue(TNode* val) { // push연산을 수행한다.
+	if (is_full()) error("큐 포화 에러\n");
+	rear = (rear + 1) % MAX_QUEUE_SIZE;
+	data[rear] = val;
+}
+
+TNode* dequeue() { // 큐의 가장 앞에 있는 데이터를 pop한다
+	if (is_empty()) error("큐 공백 에러\n");
+	front = (front + 1) % MAX_QUEUE_SIZE;
+	return data[front]; // pop한 데이터를 반환한다.
+}
+
+TNode* peek() { // 가장 앞에 있는 데이터 반환
+	if (is_empty()) error("큐 공백 에러\n");
+	return data[(front + 1) % MAX_QUEUE_SIZE];
+}
+
+void levelorder(TNode* root) { // 레벨 순회
+	TNode* n;
+	if (root == NULL) return;
+	init_queue(); // 큐를 초기화 한다
+	enqueue(root); // 루트 노드를 큐에 삽입한다
+	while (!is_empty()) { // 큐가 빈 공간이 될 때 까지 반복
+		n = dequeue(); // 가장 앞에 있는 노드의
+		if (n != NULL) {
+			printf("[%c] ", n->data);
+			enqueue(n->left); // 왼쪽 자식과
+			enqueue(n->right); // 오른쪽 자식을 넣는다.
+		}
+	}
+}
+
+/* 아래의 함수 3개는 재귀 구조이다. */
+int count_node(TNode* n) { // 노드의 개수
+	if (n == NULL) return 0;
+	return 1 + count_node(n->left) + count_node(n->right);
+}
+
+int count_leaf(TNode* n) { // 리프 노드의 개수
+	if (n == NULL) return 0;
+	// 자식 노드가 단 하나도 없다. 즉 리프 노드를 의미한다.
+	if (n->left == NULL && n->right == NULL) return 1; 
+	else return count_leaf(n->left) + count_leaf(n->right);
+}
+
+int calc_height(TNode* n) { // 트리 높이 반환
+	int hLeft, hRight;
+	if (n == NULL) return 0;
+	hLeft = calc_height(n->left);
+	hRight = calc_height(n->right);
+	return (hLeft > hRight) ? hLeft + 1 : hRight + 1;
+}
+
+//======================추가된 내용 시작========================
+
+// >>> 1번: 완전 이진트리인지 검사
+int is_complete_binary_tree(TNode* root) {
+	/* 레벨 순회를 진행하면서, 루트 노드를 시작으로
+	왼쪽 자식 노드와 오른쪽 자식 노드를 큐에 넣는 연산을 수행한다.
+	모든 경우의 수를 따져봤을 때,
+	1개 이상의 임의의 노드가 왼쪽 자식은 NULL인데 오른쪽 자식을 가지고 있다면 완전 이진트리가 아니다.
+	위 경우를 제외한 모든 경우에는 완전 이진트리를 만족한다. */
+	TNode* n;
+	if (root == NULL) return 1; // 공집합 노드 역시 트리로 간주되며 완전 이진트리 범주에 포함된다.
+	init_queue();
+	enqueue(root);
+	while (!is_empty()) { // 큐가 빈 공간이 될 때 까지 반복
+		n = dequeue(); // 가장 앞에 있는 노드를 pop 해서 n에 대입
+
+		// 왼쪽 자식이 NULL이고 오른쪽 자식이 NULL이 아닌 경우
+		if (n->left == NULL && n->right != NULL) return 0; 
+
+		// nullptr 오류를 방지하기 위해 두 개의 if문으로 나눔
+		if (n != NULL && n->left != NULL) enqueue(n->left); 
+		if (n != NULL && n->right != NULL) enqueue(n->right);
+	}
+	return 1; // 완전 이진트리 조건을 만족
+}
+
+// >>> 2번: 임의의 노드의 레벨을 출력한다.
+void dfs_level(TNode* root, TNode* goal) {
+	/*  임의의 노드(goal)의 data값과 재귀로 호출된 노드(root)의 data값을 비교했다.
+		호출된 재귀의 깊이가 즉 레벨이기 때문에 아래와 같이 구현했다. */
+	if (root->data == goal->data) curr_level = depth;
+	if (root->left != NULL) {
+		depth++;
+		dfs_level(root->left, goal);
+		depth--;
+	}
+	if (root->right != NULL) {
+		depth++;
+		dfs_level(root->right, goal);
+		depth--;
+	}
+}
+
+int level(TNode* node) { // 함수의 매개변수가 제시되어 있기 때문에 재귀 구현을 위해 추가적인 함수 정의
+	/*  트리의 임의의 노드의 레벨을 구할 때,
+		큐를 활용한 너비 우선 탐색 방식으로 레벨을 찾든,
+		재귀를 활용한 깊이 우선 탐색 방식으로 레벨을 찾든
+		최악의 경우에는 모든 노드를 탐색해야 한다는 것이 동일하다.
+		레벨을 구한하는 점에 있어서 트리의 깊이와 상당한 연관이 있기 때문에
+		재귀 함수로 구현해서 깊이 우선 탐색 방식으로 값을 찾을 것이다. */
+	if (root == NULL) return 0;
+	dfs_level(root, node);
+	// 문제에서 주어진 조건: 임의의 노드가 트리에 포함되지 않으면 0을 반환해라.
+	// curr_level 은 전역변수이기 때문에 조건에 만족하지 못해서 아무 값도 대입되지 않는다면 0이 반환된다. 
+	return curr_level;
+}
+
+// >>> 3번: 이진트리가 균형잡혀있는지 판별하는 함수
+int is_balanced(TNode* root) { // calc_height() 함수와 매우 유사
+	int hLeft, hRight;
+	if (root == NULL) return 1; // 공집합 트리 역시 균형잡혀 있다고 볼 수 있다.
+	hLeft = calc_height(root->left);
+	hRight = calc_height(root->right);
+	/*  절대값을 사용한 이유: 완전 이진트리 형태가 아니더라도 균형 잡힌 트리일 수 있다.
+		즉, 상위 노드 기준 왼쪽 자식 노드는 없고 오른쪽 자식 노드만 있는 경우, 차이값을 구하기 위해서는
+		작은 값에서 큰 값을 빼야한다. 차이가 2보다 작은지 판별해야 하는데, 
+		절대값 함수를 사용하는 것이 표현 상 더 깔끔하며 직관적이다. 
+		
+		모든 노드에서 좌 우 균형이 2보다 작고, 
+		재귀적 구조로 봤을 때 왼쪽 노드와 오른쪽 노드가 균형 잡혀 있다면 균형 잡힌 트리라고 볼 수 있다. */
+	if (abs(hLeft - hRight) < 2 && is_balanced(root->left) == 1 && is_balanced(root->right) == 1)
+		return 1;
+	return 0;
+}
+
+// >>> 4번: 경로의 길이를 반환
+int path_length(TNode* root) {
+	/*  재귀적으로 구현하는 것이 가장 직관적이라고 생각했다.
+		노드를 차례대로 탐색하며 노드의 높이를 반환하는 함수 calc_height() 함수를 사용해서,
+		(트리의 높이 - calc_height()) 연산을 진행하면 원하는 값을 얻을 수 있을 것이라 생각했다.
+		int 타입의 전역변수 total_length를 선언했지만, 직관성을 위해 전역에 선언했다.
+		따라서 이 함수는 경로 계산 및 재귀의 용도로만 쓰이고, 경로의 길이는 전역 변수에 저장된다. */
+	if (root == NULL) return 0;
+	total_length += path_length(root->left);
+	total_length += path_length(root->right);
+	return tree_height - calc_height(root);
+}
+
+// >>> 5번: 이진트리를 좌우 대칭시킨다.
+int reverse(TNode* root) {
+	if (root == NULL) return 0;
+	TNode* tmp = root->left; // 상위(부모) 노드의 왼쪽 자식 노드 주소값을 tmp에 임시 저장
+	root->left = root->right; // 상위(부모) 노드의 오른쪽 주소값을 왼쪽 주소값에 대입
+	root->right = tmp; // 임시 저장해둔 왼쪽 주소값을 오른쪽 주소값에 대입
+	reverse(root->left); // 왼쪽 하위 노드에도 재귀적으로 호출해서 똑같은 작업 지시
+	reverse(root->right); // 오른쪽 하위 노드에도 재귀적으로 호출해서 똑같은 작업 지시
+	return 1;
+}
+
+//======================추가된 내용 끝==========================
+
+int main() {
+	TNode* b, * c, * d, * e, * f, * g;
+	init_tree();
+	d = create_tree('D', NULL, NULL);
+	e = create_tree('E', NULL, NULL);
+	b = create_tree('B', d, e);
+	f = create_tree('F', NULL, NULL);
+
+	/* >>> 완전 이진트리 반례
+	c = create_tree('C', f, NULL);*/
+
+	c = create_tree('C', NULL, f);
+	root = create_tree('A', b, c);
+
+	/* >>> 균형 반례
+	c = create_tree('C', NULL, NULL);
+	b = create_tree('B', c, NULL);
+	root = create_tree('A', b, NULL); */
+
+	// 트리테스트프로그램추가
+	printf("\n ==================== 기존의 내용 ====================\n");
+	printf("\n * In-Order : "); inorder(root);
+	printf("\n * Pre-Order : "); preorder(root);
+	printf("\n * Post-Order : "); postorder(root);
+	printf("\n * Level-Order : "); levelorder(root);
+	printf("\n");
+	printf(" * 노드의개수= %d\n", count_node(root));
+	printf(" * 단말의개수= %d\n", count_leaf(root));
+	// 함수를 호출하며 값을 tree_height변수에 저장
+	printf(" * 트리의높이= %d\n", tree_height = calc_height(root));
+
+	printf("\n ==================== 추가된 내용 ====================\n");
+	printf("\n * 완전 이진트리인가? (0: false, 1: true) ==> %d", is_complete_binary_tree(root));
+	printf("\n * 임의의 노드의 레벨은? ==> %d", level(f));
+	printf("\n * 트리가 균형이 잡혀있는 상태인가? (0: false, 1: true) ==> %d", is_balanced(root));
+	path_length(root); // 경로의 길이를 구하는 연산을 수행
+	printf("\n * 트리의 모든 경로의 길이 합은? ==> %d", total_length);
+	printf("\n * 트리를 좌우 대칭시킨다 (0: fail, 1: success) ==> %d", reverse(root));
+	printf("\n\n =============== 좌우대칭 이후 트리 순회 결과 ===============\n");
+	printf("\n * In-Order : "); inorder(root);
+	printf("\n * Pre-Order : "); preorder(root);
+	printf("\n * Post-Order : "); postorder(root);
+	printf("\n * Level-Order : "); levelorder(root);
+	printf("\n");
+
+	return 0;
+}
