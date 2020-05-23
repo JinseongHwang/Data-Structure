@@ -4,7 +4,8 @@
 
 [(1) 순환 및 재귀](https://blog.naver.com/eddy5360/221933056775)
 
-[(2) 배열, 구조체 그리고 포인터](https://blog.naver.com/eddy5360/221946173072)
+[(2) 배열과 구조체](https://blog.naver.com/eddy5360/221946173072)
 
+[(3) 포인터와 메모리 동적 할당](https://blog.naver.com/eddy5360/221976262775)
 
 지속적으로 작성중 ...
