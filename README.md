@@ -10,4 +10,6 @@
 
 [(4) 스택](https://blog.naver.com/eddy5360/221993112926)
 
+[(5) 큐](https://blog.naver.com/eddy5360/221993461648)
+
 지속적으로 작성중 ...
