@@ -12,4 +12,6 @@
 
 [(5) 큐](https://blog.naver.com/eddy5360/221993461648)
 
+[(6) 연결리스트 上](https://blog.naver.com/eddy5360/221994921792)
+
 지속적으로 작성중 ...
