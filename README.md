@@ -18,4 +18,6 @@
 
 [(8) 트리](https://blog.naver.com/eddy5360/221996796335)
 
+[(9) 이진 탐색](https://blog.naver.com/eddy5360/221997390085)
+
 지속적으로 작성중 ...
