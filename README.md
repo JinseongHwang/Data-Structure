@@ -28,4 +28,6 @@
 
 [(13) Union-Find](https://blog.naver.com/eddy5360/221999100048)
 
+[(14) 최소 스패닝 트리(Kruskal)](https://blog.naver.com/eddy5360/221999432561)
+
 지속적으로 작성중 ...
