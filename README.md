@@ -30,4 +30,6 @@
 
 [(14) 최소 스패닝 트리(Kruskal)](https://blog.naver.com/eddy5360/221999432561)
 
+[(15) 최소 스패닝 트리(Prim)](https://blog.naver.com/eddy5360/221999660736)
+
 지속적으로 작성중 ...
