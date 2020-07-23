@@ -1,6 +1,7 @@
-정점의 개수에 따른,    
-1. 최소 스패닝 트리 알고리즘(Kruskal, Prim)의 실행 시간 비교    
-![MST](./그래프과제/img/MST.png)    
+# Result Graph Images    
     
-2. 최단경로 알고리즘(Dijkstra, Floyd)의 실행 시간 비교    
-![SP](./그래프과제/img/SP.png)    
+---------------------    
+![MST](https://user-images.githubusercontent.com/52629158/88287047-bceb1700-cd2c-11ea-9954-cda7ab50f7ff.png)    
+    
+---------------------    
+![SP](https://user-images.githubusercontent.com/52629158/88287051-be1c4400-cd2c-11ea-97db-2e55eae07c68.png)    
