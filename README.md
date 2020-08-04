@@ -20,7 +20,7 @@
 
 [(9) 이진 탐색](https://blog.naver.com/eddy5360/221997390085)
 
-[(10) 우선순위 큐](https://blog.naver.com/eddy5360/221998493856) => 내용X 추가 예정
+[(10) 우선순위 큐](https://blog.naver.com/eddy5360/221998493856)
 
 [(11) DFS: 깊이우선탐색](https://blog.naver.com/eddy5360/221998495890) => 내용X 추가 예정
 
