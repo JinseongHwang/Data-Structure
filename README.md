@@ -32,4 +32,12 @@
 
 [(15) 최소 스패닝 트리(Prim)](https://blog.naver.com/eddy5360/221999660736)
 
-지속적으로 작성중 ...
+(16) 최단 경로(Dijkstra)
+
+(17) 최단 경로(Floyd-Warshall)
+
+(18) 정렬 알고리즘
+
+(19) 탐색 알고리즘
+
+(20) 해싱(Dictionary | Map)
